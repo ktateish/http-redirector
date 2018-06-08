@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"unicode"
 
 	"github.com/spf13/pflag"
@@ -16,7 +17,8 @@ const (
 )
 
 var (
-	toSite string
+	toSite             string
+	muteLogAgentPrefix string
 )
 
 func toUpper(s string) string {
@@ -55,6 +57,7 @@ func setFlagsFromEnv() {
 
 func init() {
 	pflag.StringVar(&toSite, "to-site", "", "site the incoming requests will be redirected to")
+	pflag.StringVar(&muteLogAgentPrefix, "mute-log-agent-prefix", "", "user agent that will not be logged")
 }
 
 func main() {
@@ -76,7 +79,10 @@ func main() {
 			ref = "-"
 		}
 
-		log.Printf("%s %s %s%s %s", r.RemoteAddr, ff, r.Host, r.RequestURI, ref)
+		ua := r.UserAgent()
+		if muteLogAgentPrefix == "" || !strings.HasPrefix(ua, muteLogAgentPrefix) {
+			log.Printf("%s %s %s%s %s", r.RemoteAddr, ff, r.Host, r.RequestURI, ref)
+		}
 
 		toURI := fmt.Sprintf("%s%s", toSite, r.RequestURI)
 		http.Redirect(w, r, toURI, http.StatusMovedPermanently)
