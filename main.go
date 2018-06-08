@@ -76,11 +76,10 @@ func main() {
 			ref = "-"
 		}
 
-		log.Printf("%s %s %s%s?%s %s", r.RemoteAddr, ff, r.Host, r.URL.Path, r.URL.RawQuery, ref)
-		//log.Printf("%s %s", r.URL, r.Referer())
+		log.Printf("%s %s %s%s %s", r.RemoteAddr, ff, r.Host, r.RequestURI, ref)
 
-		toURL := fmt.Sprintf("%s%s?%s", toSite, r.URL.Path, r.URL.RawQuery)
-		http.Redirect(w, r, toURL, http.StatusMovedPermanently)
+		toURI := fmt.Sprintf("%s%s", toSite, r.RequestURI)
+		http.Redirect(w, r, toURI, http.StatusMovedPermanently)
 	})
 
 	log.Printf("Redirect all requests to %s\n", toSite)
