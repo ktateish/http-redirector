@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -75,10 +76,10 @@ func main() {
 			ref = "-"
 		}
 
-		log.Printf("%s %s %s%s %s", r.RemoteAddr, ff, r.Host, r.URL.Path, ref)
+		log.Printf("%s %s %s%s?%s %s", r.RemoteAddr, ff, r.Host, r.URL.Path, r.URL.RawQuery, ref)
 		//log.Printf("%s %s", r.URL, r.Referer())
 
-		toURL := toSite + r.URL.Path
+		toURL := fmt.Sprintf("%s%s?%s", toSite, r.URL.Path, r.URL.RawQuery)
 		http.Redirect(w, r, toURL, http.StatusMovedPermanently)
 	})
 
